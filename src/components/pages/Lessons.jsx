@@ -11,7 +11,7 @@ import Empty from "@/components/ui/Empty";
 import Badge from "@/components/atoms/Badge";
 import Button from "@/components/atoms/Button";
 import { cn } from "@/utils/cn";
-import { toast } from "@/utils/toast";
+import { toast } from "react-toastify";
 
 const Lessons = () => {
 const [lessons, setLessons] = useState([])
