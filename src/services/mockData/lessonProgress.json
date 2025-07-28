@@ -1,0 +1,72 @@
+[
+  {
+    "Id": 1,
+    "user_id": 2,
+    "lesson_id": 1,
+    "progress_pct": 100,
+    "last_seen_at": "2024-01-15T14:30:00Z"
+  },
+  {
+    "Id": 2,
+    "user_id": 2,
+    "lesson_id": 2,
+    "progress_pct": 85,
+    "last_seen_at": "2024-01-16T10:15:00Z"
+  },
+  {
+    "Id": 3,
+    "user_id": 2,
+    "lesson_id": 4,
+    "progress_pct": 45,
+    "last_seen_at": "2024-01-14T16:20:00Z"
+  },
+  {
+    "Id": 4,
+    "user_id": 3,
+    "lesson_id": 1,
+    "progress_pct": 100,
+    "last_seen_at": "2024-01-12T09:45:00Z"
+  },
+  {
+    "Id": 5,
+    "user_id": 3,
+    "lesson_id": 2,
+    "progress_pct": 100,
+    "last_seen_at": "2024-01-13T11:30:00Z"
+  },
+  {
+    "Id": 6,
+    "user_id": 3,
+    "lesson_id": 3,
+    "progress_pct": 70,
+    "last_seen_at": "2024-01-15T15:10:00Z"
+  },
+  {
+    "Id": 7,
+    "user_id": 4,
+    "lesson_id": 1,
+    "progress_pct": 35,
+    "last_seen_at": "2024-01-16T08:20:00Z"
+  },
+  {
+    "Id": 8,
+    "user_id": 4,
+    "lesson_id": 12,
+    "progress_pct": 60,
+    "last_seen_at": "2024-01-15T20:30:00Z"
+  },
+  {
+    "Id": 9,
+    "user_id": 6,
+    "lesson_id": 8,
+    "progress_pct": 90,
+    "last_seen_at": "2024-01-16T13:45:00Z"
+  },
+  {
+    "Id": 10,
+    "user_id": 6,
+    "lesson_id": 9,
+    "progress_pct": 25,
+    "last_seen_at": "2024-01-14T17:50:00Z"
+  }
+]

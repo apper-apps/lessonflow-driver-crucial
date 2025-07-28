@@ -1,0 +1,44 @@
+[
+  {
+    "Id": 1,
+    "email": "admin@lessonflow.com",
+    "name": "관리자",
+    "role": "admin",
+    "tier_id": 3
+  },
+  {
+    "Id": 2,
+    "email": "member1@example.com",
+    "name": "김한국",
+    "role": "member",
+    "tier_id": 2
+  },
+  {
+    "Id": 3,
+    "email": "member2@example.com", 
+    "name": "이학습",
+    "role": "member",
+    "tier_id": 2
+  },
+  {
+    "Id": 4,
+    "email": "guest1@example.com",
+    "name": "박무료",
+    "role": "guest",
+    "tier_id": 1
+  },
+  {
+    "Id": 5,
+    "email": "guest2@example.com",
+    "name": "최체험",
+    "role": "guest", 
+    "tier_id": null
+  },
+  {
+    "Id": 6,
+    "email": "vip@example.com",
+    "name": "정프리미엄",
+    "role": "member",
+    "tier_id": 3
+  }
+]
