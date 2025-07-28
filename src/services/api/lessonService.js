@@ -33,11 +33,16 @@ const lessonService = {
       }
       
       return response.data || []
-    } catch (error) {
+} catch (error) {
       if (error?.response?.data?.message) {
         console.error("Error fetching lessons:", error?.response?.data?.message)
+        toast.error(`강의를 불러오는데 실패했습니다: ${error.response.data.message}`)
+      } else if (error?.message?.includes('Network Error') || error?.code === 'NETWORK_ERROR') {
+        console.error("Network error fetching lessons:", error.message)
+        toast.error("네트워크 연결을 확인해주세요")
       } else {
-        console.error(error.message)
+        console.error("Error fetching lessons:", error?.message || "Unknown error")
+        toast.error("강의를 불러오는데 실패했습니다")
       }
       return []
     }
@@ -71,10 +76,15 @@ const lessonService = {
       
       return response.data
     } catch (error) {
-      if (error?.response?.data?.message) {
+if (error?.response?.data?.message) {
         console.error(`Error fetching lesson with ID ${id}:`, error?.response?.data?.message)
+        toast.error(`강의를 불러오는데 실패했습니다: ${error.response.data.message}`)
+      } else if (error?.message?.includes('Network Error') || error?.code === 'NETWORK_ERROR') {
+        console.error(`Network error fetching lesson with ID ${id}:`, error.message)
+        toast.error("네트워크 연결을 확인해주세요")
       } else {
-        console.error(error.message)
+        console.error(`Error fetching lesson with ID ${id}:`, error?.message || "Unknown error")
+        toast.error("강의를 불러오는데 실패했습니다")
       }
       return null
     }
@@ -111,10 +121,15 @@ const lessonService = {
       
       return response.data || []
     } catch (error) {
-      if (error?.response?.data?.message) {
+if (error?.response?.data?.message) {
         console.error("Error fetching favorite lessons:", error?.response?.data?.message)
+        toast.error(`관심 강의를 불러오는데 실패했습니다: ${error.response.data.message}`)
+      } else if (error?.message?.includes('Network Error') || error?.code === 'NETWORK_ERROR') {
+        console.error("Network error fetching favorite lessons:", error.message)
+        toast.error("네트워크 연결을 확인해주세요")
       } else {
-        console.error(error.message)
+        console.error("Error fetching favorite lessons:", error?.message || "Unknown error")
+        toast.error("관심 강의를 불러오는데 실패했습니다")
       }
       return []
     }
@@ -166,11 +181,16 @@ const lessonService = {
         
         return successfulRecords.length > 0 ? successfulRecords[0].data : null
       }
-    } catch (error) {
+} catch (error) {
       if (error?.response?.data?.message) {
         console.error("Error creating lesson:", error?.response?.data?.message)
+        toast.error(`강의 생성에 실패했습니다: ${error.response.data.message}`)
+      } else if (error?.message?.includes('Network Error') || error?.code === 'NETWORK_ERROR') {
+        console.error("Network error creating lesson:", error.message)
+        toast.error("네트워크 연결을 확인해주세요")
       } else {
-        console.error(error.message)
+        console.error("Error creating lesson:", error?.message || "Unknown error")
+        toast.error("강의 생성에 실패했습니다")
       }
       return null
     }
@@ -225,14 +245,18 @@ const lessonService = {
       }
     } catch (error) {
       if (error?.response?.data?.message) {
-        console.error("Error updating lesson:", error?.response?.data?.message)
+console.error("Error updating lesson:", error?.response?.data?.message)
+        toast.error(`강의 수정에 실패했습니다: ${error.response.data.message}`)
+      } else if (error?.message?.includes('Network Error') || error?.code === 'NETWORK_ERROR') {
+        console.error("Network error updating lesson:", error.message)
+        toast.error("네트워크 연결을 확인해주세요")
       } else {
-        console.error(error.message)
+        console.error("Error updating lesson:", error?.message || "Unknown error")
+        toast.error("강의 수정에 실패했습니다")
       }
       return null
     }
   },
-  
   async delete(id) {
     try {
       const { ApperClient } = window.ApperSDK
@@ -267,11 +291,16 @@ const lessonService = {
         
         return successfulDeletions.length > 0
       }
-    } catch (error) {
+} catch (error) {
       if (error?.response?.data?.message) {
         console.error("Error deleting lesson:", error?.response?.data?.message)
+        toast.error(`강의 삭제에 실패했습니다: ${error.response.data.message}`)
+      } else if (error?.message?.includes('Network Error') || error?.code === 'NETWORK_ERROR') {
+        console.error("Network error deleting lesson:", error.message)
+        toast.error("네트워크 연결을 확인해주세요")
       } else {
-        console.error(error.message)
+        console.error("Error deleting lesson:", error?.message || "Unknown error")
+        toast.error("강의 삭제에 실패했습니다")
       }
       return false
     }

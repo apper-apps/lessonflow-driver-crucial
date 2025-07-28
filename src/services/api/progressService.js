@@ -34,10 +34,15 @@ const progressService = {
       
       return response.data || []
     } catch (error) {
-      if (error?.response?.data?.message) {
+if (error?.response?.data?.message) {
         console.error("Error fetching progress:", error?.response?.data?.message)
+        toast.error(`진도를 불러오는데 실패했습니다: ${error.response.data.message}`)
+      } else if (error?.message?.includes('Network Error') || error?.code === 'NETWORK_ERROR') {
+        console.error("Network error fetching progress:", error.message)
+        toast.error("네트워크 연결을 확인해주세요")
       } else {
-        console.error(error.message)
+        console.error("Error fetching progress:", error?.message || "Unknown error")
+        toast.error("진도를 불러오는데 실패했습니다")
       }
       return []
     }
@@ -73,8 +78,12 @@ const progressService = {
     } catch (error) {
       if (error?.response?.data?.message) {
         console.error(`Error fetching progress with ID ${id}:`, error?.response?.data?.message)
+} else if (error?.message?.includes('Network Error') || error?.code === 'NETWORK_ERROR') {
+        console.error("Network error fetching progress by ID:", error.message)
+        toast.error("네트워크 연결을 확인해주세요")
       } else {
-        console.error(error.message)
+        console.error("Error fetching progress by ID:", error?.message || "Unknown error")
+        toast.error("진도를 불러오는데 실패했습니다")
       }
       return null
     }
@@ -120,10 +129,15 @@ const progressService = {
       
       return response.data || []
     } catch (error) {
-      if (error?.response?.data?.message) {
+if (error?.response?.data?.message) {
         console.error("Error fetching user progress:", error?.response?.data?.message)
+        toast.error(`사용자 진도를 불러오는데 실패했습니다: ${error.response.data.message}`)
+      } else if (error?.message?.includes('Network Error') || error?.code === 'NETWORK_ERROR') {
+        console.error("Network error fetching user progress:", error.message)
+        toast.error("네트워크 연결을 확인해주세요")
       } else {
-        console.error(error.message)
+        console.error("Error fetching user progress:", error?.message || "Unknown error")
+        toast.error("사용자 진도를 불러오는데 실패했습니다")
       }
       return []
     }
@@ -169,10 +183,15 @@ const progressService = {
       
       return response.data || []
     } catch (error) {
-      if (error?.response?.data?.message) {
+if (error?.response?.data?.message) {
         console.error("Error fetching lesson progress:", error?.response?.data?.message)
+        toast.error(`강의 진도를 불러오는데 실패했습니다: ${error.response.data.message}`)
+      } else if (error?.message?.includes('Network Error') || error?.code === 'NETWORK_ERROR') {
+        console.error("Network error fetching lesson progress:", error.message)
+        toast.error("네트워크 연결을 확인해주세요")
       } else {
-        console.error(error.message)
+        console.error("Error fetching lesson progress:", error?.message || "Unknown error")
+        toast.error("강의 진도를 불러오는데 실패했습니다")
       }
       return []
     }
@@ -222,11 +241,16 @@ const progressService = {
         
         return successfulRecords.length > 0 ? successfulRecords[0].data : null
       }
-    } catch (error) {
+} catch (error) {
       if (error?.response?.data?.message) {
         console.error("Error creating progress:", error?.response?.data?.message)
+        toast.error(`진도 생성에 실패했습니다: ${error.response.data.message}`)
+      } else if (error?.message?.includes('Network Error') || error?.code === 'NETWORK_ERROR') {
+        console.error("Network error creating progress:", error.message)
+        toast.error("네트워크 연결을 확인해주세요")
       } else {
-        console.error(error.message)
+        console.error("Error creating progress:", error?.message || "Unknown error")
+        toast.error("진도 생성에 실패했습니다")
       }
       return null
     }
@@ -277,11 +301,16 @@ const progressService = {
         
         return successfulUpdates.length > 0 ? successfulUpdates[0].data : null
       }
-    } catch (error) {
+} catch (error) {
       if (error?.response?.data?.message) {
         console.error("Error updating progress:", error?.response?.data?.message)
+        toast.error(`진도 수정에 실패했습니다: ${error.response.data.message}`)
+      } else if (error?.message?.includes('Network Error') || error?.code === 'NETWORK_ERROR') {
+        console.error("Network error updating progress:", error.message)
+        toast.error("네트워크 연결을 확인해주세요")
       } else {
-        console.error(error.message)
+        console.error("Error updating progress:", error?.message || "Unknown error")
+        toast.error("진도 수정에 실패했습니다")
       }
       return null
     }
@@ -323,9 +352,14 @@ const progressService = {
       }
     } catch (error) {
       if (error?.response?.data?.message) {
-        console.error("Error deleting progress:", error?.response?.data?.message)
+console.error("Error deleting progress:", error?.response?.data?.message)
+        toast.error(`진도 삭제에 실패했습니다: ${error.response.data.message}`)
+      } else if (error?.message?.includes('Network Error') || error?.code === 'NETWORK_ERROR') {
+        console.error("Network error deleting progress:", error.message)
+        toast.error("네트워크 연결을 확인해주세요")
       } else {
-        console.error(error.message)
+        console.error("Error deleting progress:", error?.message || "Unknown error")
+        toast.error("진도 삭제에 실패했습니다")
       }
       return false
     }

@@ -95,8 +95,14 @@ function AppContent() {
           dispatch(clearUser())
         }
       },
-      onError: function(error) {
-        console.error("Authentication failed:", error)
+onError: function(error) {
+        if (error?.message?.includes('Network Error') || error?.code === 'NETWORK_ERROR') {
+          console.error("Network error during authentication:", error.message)
+        } else if (error?.response?.data?.message) {
+          console.error("Authentication failed:", error.response.data.message)
+        } else {
+          console.error("Authentication failed:", error?.message || "Unknown authentication error")
+        }
         setIsInitialized(true)
       }
     })
