@@ -21,7 +21,7 @@ const Home = () => {
     loadHomeData()
   }, [])
   
-  const loadHomeData = async () => {
+const loadHomeData = async () => {
     try {
       setLoading(true)
       setError("")
@@ -34,10 +34,11 @@ const Home = () => {
       // 추천 레슨 (처음 6개)
       setFeaturedLessons(lessons.slice(0, 6))
       
-      // 최근 학습 진행률 (최근 3개)
+      // 최근 학습 진행률 (최근 3개) - handle lookup fields properly
       const recentProgressWithLessons = await Promise.all(
         progress.slice(0, 3).map(async (prog) => {
-          const lesson = await lessonService.getById(prog.lesson_id)
+          const lessonIdValue = prog.lesson_id?.Id || prog.lesson_id
+          const lesson = await lessonService.getById(lessonIdValue)
           return { ...prog, lesson }
         })
       )

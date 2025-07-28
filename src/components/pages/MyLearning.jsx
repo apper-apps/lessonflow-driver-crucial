@@ -30,7 +30,7 @@ const MyLearning = () => {
     loadLearningData()
   }, [])
   
-  const loadLearningData = async () => {
+const loadLearningData = async () => {
     try {
       setLoading(true)
       setError("")
@@ -40,13 +40,12 @@ const MyLearning = () => {
         lessonService.getAll()
       ])
       
-      // 진행률 데이터에 레슨 정보 추가
-      const progressWithLessons = await Promise.all(
-        progressList.map(async (progress) => {
-          const lesson = lessonsList.find(l => l.Id === progress.lesson_id)
-          return { ...progress, lesson }
-        })
-      )
+      // 진행률 데이터에 레슨 정보 추가 - handle lookup fields properly
+      const progressWithLessons = progressList.map((progress) => {
+        const lessonIdValue = progress.lesson_id?.Id || progress.lesson_id
+        const lesson = lessonsList.find(l => l.Id === lessonIdValue)
+        return { ...progress, lesson }
+      })
       
       setProgressData(progressWithLessons)
       setLessons(lessonsList)

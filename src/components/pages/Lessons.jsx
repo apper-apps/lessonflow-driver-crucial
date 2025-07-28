@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
+import favoritesService from "@/services/api/favoritesService";
 import progressService from "@/services/api/progressService";
 import lessonService from "@/services/api/lessonService";
-import favoritesService from "@/services/api/favoritesService";
 import ApperIcon from "@/components/ApperIcon";
 import SearchBar from "@/components/molecules/SearchBar";
 import LessonCard from "@/components/molecules/LessonCard";
@@ -11,6 +11,7 @@ import Empty from "@/components/ui/Empty";
 import Badge from "@/components/atoms/Badge";
 import Button from "@/components/atoms/Button";
 import { cn } from "@/utils/cn";
+import { toast } from "@/utils/toast";
 
 const Lessons = () => {
 const [lessons, setLessons] = useState([])
@@ -44,12 +45,12 @@ const [lessons, setLessons] = useState([])
     filterAndSortLessons()
   }, [lessons, progress, searchQuery, selectedTier, sortBy])
   
-  const loadLessons = async () => {
+const loadLessons = async () => {
     try {
       setLoading(true)
       setError("")
       
-const [lessonsData, progressData, favoritesData] = await Promise.all([
+      const [lessonsData, progressData, favoritesData] = await Promise.all([
         lessonService.getAll(),
         progressService.getAll(),
         favoritesService.getByUserId(1) // Mock current user ID
@@ -117,19 +118,29 @@ const getLessonProgress = (lessonId) => {
     return favorites.some(fav => fav.lesson_id === lessonId)
   }
 
-  const handleFavoriteChange = (lessonId, isFavorited) => {
-    if (isFavorited) {
-      // Add to favorites
-      const newFavorite = {
-        Id: Math.max(...favorites.map(f => f.Id), 0) + 1,
-        user_id: 1,
-        lesson_id: lessonId,
-        created_at: new Date().toISOString()
+const handleFavoriteChange = async (lessonId, isFavorited) => {
+    try {
+      if (isFavorited) {
+        // Add to favorites - use database operations
+        const newFavorite = await favoritesService.addFavorite(1, lessonId)
+        if (newFavorite) {
+          setFavorites(prev => [...prev, newFavorite])
+          toast.success("즐겨찾기에 추가되었습니다.")
+        }
+      } else {
+        // Remove from favorites - use database operations
+        await favoritesService.removeFavorite(1, lessonId)
+        setFavorites(prev => {
+          const lessonIdValue = typeof lessonId === 'object' ? lessonId.Id : lessonId
+          return prev.filter(fav => {
+            const favLessonIdValue = fav.lesson_id?.Id || fav.lesson_id
+            return favLessonIdValue !== lessonIdValue
+          })
+        })
+        toast.success("즐겨찾기에서 제거되었습니다.")
       }
-      setFavorites(prev => [...prev, newFavorite])
-    } else {
-      // Remove from favorites
-      setFavorites(prev => prev.filter(fav => fav.lesson_id !== lessonId))
+    } catch (err) {
+      toast.error(err.message || "즐겨찾기 처리 중 오류가 발생했습니다.")
     }
   }
   

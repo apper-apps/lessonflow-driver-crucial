@@ -22,7 +22,7 @@ const Membership = () => {
     loadMembershipData()
   }, [])
   
-  const loadMembershipData = async () => {
+const loadMembershipData = async () => {
     try {
       setLoading(true)
       setError("")
@@ -32,7 +32,7 @@ const Membership = () => {
         userService.getAll()
       ])
       
-      // 활성화된 티어만 표시
+      // 활성화된 티어만 표시 - handle lookup field properly
       const activeTiers = tiersData.filter(tier => tier.is_active)
       setTiers(activeTiers)
       
@@ -41,9 +41,10 @@ const Membership = () => {
         const user = usersData[0]
         setCurrentUser(user)
         
-        // 현재 사용자의 멤버십 티어 정보
+        // 현재 사용자의 멤버십 티어 정보 - handle lookup field properly
         if (user.tier_id) {
-          const userTier = tiersData.find(tier => tier.Id === user.tier_id)
+          const tierIdValue = user.tier_id?.Id || user.tier_id
+          const userTier = tiersData.find(tier => tier.Id === tierIdValue)
           setCurrentTier(userTier)
         }
       }
@@ -65,7 +66,7 @@ const Membership = () => {
     setShowPaymentModal(true)
   }
   
-  const handlePayment = async () => {
+const handlePayment = async () => {
     try {
       // Stripe 결제 프로세스 시뮬레이션
       toast.info("결제 처리 중...")
@@ -73,22 +74,27 @@ const Membership = () => {
       // 실제 구현에서는 Stripe Checkout 세션 생성
       await new Promise(resolve => setTimeout(resolve, 2000))
       
-      // 사용자 멤버십 업데이트 시뮬레이션
+      // 사용자 멤버십 업데이트 - use database field names and handle lookup fields
       if (currentUser && selectedTier) {
-        await userService.update(currentUser.Id, {
-          ...currentUser,
+        const updatedUser = await userService.update(currentUser.Id, {
+          Name: currentUser.Name,
+          Tags: currentUser.Tags,
+          Owner: currentUser.Owner,
+          email: currentUser.email,
           tier_id: selectedTier.Id,
           role: selectedTier.Id > 1 ? "member" : "guest"
         })
         
-        setCurrentTier(selectedTier)
-        setCurrentUser(prev => ({
-          ...prev,
-          tier_id: selectedTier.Id,
-          role: selectedTier.Id > 1 ? "member" : "guest"
-        }))
-        
-        toast.success(`${selectedTier.name} 플랜으로 업그레이드되었습니다!`)
+        if (updatedUser) {
+          setCurrentTier(selectedTier)
+          setCurrentUser(prev => ({
+            ...prev,
+            tier_id: selectedTier.Id,
+            role: selectedTier.Id > 1 ? "member" : "guest"
+          }))
+          
+          toast.success(`${selectedTier.Name} 플랜으로 업그레이드되었습니다!`)
+        }
       }
       
       setShowPaymentModal(false)

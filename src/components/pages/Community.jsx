@@ -37,7 +37,7 @@ const Community = () => {
     filterAndSortPosts()
   }, [posts, searchQuery, sortBy])
   
-  const loadData = async () => {
+const loadData = async () => {
     try {
       setLoading(true)
       setError("")
@@ -47,12 +47,13 @@ const Community = () => {
         userService.getAll()
       ])
       
-      // 포스트에 작성자 정보 추가
+      // 포스트에 작성자 정보 추가 - handle lookup field properly
       const postsWithAuthors = postsData.map(post => {
-        const author = usersData.find(user => user.Id === post.user_id)
+        const userIdValue = post.user_id?.Id || post.user_id
+        const author = usersData.find(user => user.Id === userIdValue)
         return {
           ...post,
-          author_name: author?.name || "알 수 없음"
+          author_name: author?.Name || "알 수 없음"
         }
       })
       
@@ -103,7 +104,7 @@ const Community = () => {
     setPosts(filtered)
   }
   
-  const handleCreatePost = async (e) => {
+const handleCreatePost = async (e) => {
     e.preventDefault()
     
     if (!newPost.title.trim() || !newPost.content.trim()) {
@@ -114,7 +115,8 @@ const Community = () => {
     try {
       setCreating(true)
       
-      await postService.create({
+      // Use database field names and handle lookup fields
+      const createdPost = await postService.create({
         title: newPost.title.trim(),
         content: newPost.content.trim(),
         user_id: currentUser?.Id || 1,
@@ -123,12 +125,14 @@ const Community = () => {
         created_at: new Date().toISOString()
       })
       
-      setNewPost({ title: "", content: "" })
-      setShowCreateForm(false)
-      toast.success("게시글이 작성되었습니다.")
-      
-      // 목록 새로고침
-      await loadData()
+      if (createdPost) {
+        setNewPost({ title: "", content: "" })
+        setShowCreateForm(false)
+        toast.success("게시글이 작성되었습니다.")
+        
+        // 목록 새로고침
+        await loadData()
+      }
       
     } catch (err) {
       toast.error("게시글 작성에 실패했습니다.")
@@ -137,27 +141,35 @@ const Community = () => {
     }
   }
   
-  const handleFlagPost = async (postId, reason) => {
+const handleFlagPost = async (postId, reason) => {
     try {
       const post = posts.find(p => p.Id === postId)
       if (!post) return
       
-      await postService.update(postId, {
-        ...post,
+      // Use database field names and handle lookup fields
+      const updatedPost = await postService.update(postId, {
+        Name: post.Name,
+        Tags: post.Tags,
+        Owner: post.Owner,
+        title: post.title,
+        content: post.content,
         has_flagged: true,
-        flag_reason: reason
+        flag_reason: reason,
+        created_at: post.created_at,
+        user_id: post.user_id?.Id || post.user_id
       })
       
-      toast.success("게시글이 신고되었습니다.")
-      
-      // 목록 새로고침
-      await loadData()
+      if (updatedPost) {
+        toast.success("게시글이 신고되었습니다.")
+        
+        // 목록 새로고침
+        await loadData()
+      }
       
     } catch (err) {
       toast.error("신고 처리에 실패했습니다.")
     }
   }
-  
   if (loading) return <Loading />
   if (error) return <Error message={error} onRetry={loadData} />
   

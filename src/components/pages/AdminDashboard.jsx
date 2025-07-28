@@ -34,7 +34,7 @@ const AdminDashboard = () => {
     loadDashboardData()
   }, [])
   
-  const loadDashboardData = async () => {
+const loadDashboardData = async () => {
     try {
       setLoading(true)
       setError("")
@@ -48,12 +48,13 @@ const AdminDashboard = () => {
       // 신고된 게시글만 필터링
       const flagged = postsData.filter(post => post.has_flagged)
       
-      // 게시글에 작성자 정보 추가
+      // 게시글에 작성자 정보 추가 - handle lookup fields properly
       const flaggedWithAuthors = flagged.map(post => {
-        const author = usersData.find(user => user.Id === post.user_id)
+        const userIdValue = post.user_id?.Id || post.user_id
+        const author = usersData.find(user => user.Id === userIdValue)
         return {
           ...post,
-          author_name: author?.name || "알 수 없음",
+          author_name: author?.Name || "알 수 없음",
           author_email: author?.email || ""
         }
       })
@@ -82,19 +83,28 @@ const AdminDashboard = () => {
     }
   }
   
-  const handleUnflagPost = async (postId) => {
+const handleUnflagPost = async (postId) => {
     try {
       const post = flaggedPosts.find(p => p.Id === postId)
       if (!post) return
       
-      await postService.update(postId, {
-        ...post,
+      // Use database field names and handle lookup fields
+      const updatedPost = await postService.update(postId, {
+        Name: post.Name,
+        Tags: post.Tags,
+        Owner: post.Owner,
+        title: post.title,
+        content: post.content,
         has_flagged: false,
-        flag_reason: null
+        flag_reason: null,
+        created_at: post.created_at,
+        user_id: post.user_id?.Id || post.user_id
       })
       
-      toast.success("신고가 해제되었습니다.")
-      loadDashboardData()
+      if (updatedPost) {
+        toast.success("신고가 해제되었습니다.")
+        loadDashboardData()
+      }
       
     } catch (err) {
       toast.error("신고 해제에 실패했습니다.")
@@ -114,18 +124,25 @@ const AdminDashboard = () => {
     }
   }
   
-  const handleChangeUserRole = async (userId, newRole) => {
+const handleChangeUserRole = async (userId, newRole) => {
     try {
       const user = users.find(u => u.Id === userId)
       if (!user) return
       
-      await userService.update(userId, {
-        ...user,
-        role: newRole
+      // Use database field names and handle lookup fields
+      const updatedUser = await userService.update(userId, {
+        Name: user.Name,
+        Tags: user.Tags,
+        Owner: user.Owner,
+        email: user.email,
+        role: newRole,
+        tier_id: user.tier_id?.Id || user.tier_id
       })
       
-      toast.success(`사용자 권한이 ${newRole}로 변경되었습니다.`)
-      loadDashboardData()
+      if (updatedUser) {
+        toast.success(`사용자 권한이 ${newRole}로 변경되었습니다.`)
+        loadDashboardData()
+      }
       
     } catch (err) {
       toast.error("권한 변경에 실패했습니다.")

@@ -24,7 +24,7 @@ const LessonDetail = () => {
     loadLessonData()
   }, [id])
   
-  const loadLessonData = async () => {
+const loadLessonData = async () => {
     try {
       setLoading(true)
       setError("")
@@ -36,15 +36,22 @@ const LessonDetail = () => {
       
       setLesson(lessonData)
       
-      // 진행률 데이터 로드
+      // 진행률 데이터 로드 - handle lookup field properly
       const allProgress = await progressService.getAll()
-      const lessonProgress = allProgress.find(p => p.lesson_id === parseInt(id))
+      const lessonProgress = allProgress.find(p => {
+        const lessonIdValue = p.lesson_id?.Id || p.lesson_id
+        return lessonIdValue === parseInt(id)
+      })
       setProgress(lessonProgress)
       
-      // 관련 레슨 로드 (동일 티어의 다른 레슨들)
+      // 관련 레슨 로드 (동일 티어의 다른 레슨들) - handle lookup field properly
       const allLessons = await lessonService.getAll()
+      const tierRequiredValue = lessonData.tier_required?.Id || lessonData.tier_required
       const related = allLessons
-        .filter(l => l.Id !== parseInt(id) && l.tier_required === lessonData.tier_required)
+        .filter(l => {
+          const lessonTierValue = l.tier_required?.Id || l.tier_required
+          return l.Id !== parseInt(id) && lessonTierValue === tierRequiredValue
+        })
         .slice(0, 3)
       setRelatedLessons(related)
       
@@ -60,15 +67,19 @@ const LessonDetail = () => {
     // 실제 구현에서는 비디오 플레이어 시작
   }
   
-  const handleUpdateProgress = async (newProgress) => {
+const handleUpdateProgress = async (newProgress) => {
     try {
       if (progress) {
+        // Update existing progress - use database field names and handle lookup fields
         await progressService.update(progress.Id, {
-          ...progress,
+          Name: progress.Name,
           progress_pct: newProgress,
-          last_seen_at: new Date().toISOString()
+          last_seen_at: new Date().toISOString(),
+          user_id: progress.user_id?.Id || progress.user_id,
+          lesson_id: progress.lesson_id?.Id || progress.lesson_id
         })
       } else {
+        // Create new progress - use database field names and handle lookup fields
         await progressService.create({
           user_id: 1, // 현재 사용자 ID
           lesson_id: parseInt(id),
@@ -77,16 +88,18 @@ const LessonDetail = () => {
         })
       }
       
-      // 진행률 새로고침
+      // 진행률 새로고침 - handle lookup field properly
       const allProgress = await progressService.getAll()
-      const lessonProgress = allProgress.find(p => p.lesson_id === parseInt(id))
+      const lessonProgress = allProgress.find(p => {
+        const lessonIdValue = p.lesson_id?.Id || p.lesson_id
+        return lessonIdValue === parseInt(id)
+      })
       setProgress(lessonProgress)
       
     } catch (err) {
       console.error("진행률 업데이트 실패:", err)
     }
   }
-  
   const getTierBadgeVariant = (tierRequired) => {
     switch (tierRequired) {
       case 1: return "guest"
