@@ -60,7 +60,7 @@ const LessonCard = ({ lesson, progress, className }) => {
             {lesson.description}
           </p>
           
-          {progressPct > 0 && (
+{progressPct > 0 && (
             <div className="mb-4">
               <ProgressBar
                 value={progressPct}
