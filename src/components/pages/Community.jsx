@@ -33,10 +33,6 @@ const Community = () => {
     loadData()
   }, [])
   
-  useEffect(() => {
-    filterAndSortPosts()
-  }, [posts, searchQuery, sortBy])
-  
 const loadData = async () => {
     try {
       setLoading(true)
@@ -71,38 +67,6 @@ const loadData = async () => {
     }
   }
   
-  const filterAndSortPosts = () => {
-    let filtered = [...posts]
-    
-    // 검색 필터
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase()
-      filtered = filtered.filter(post => 
-        post.title.toLowerCase().includes(query) ||
-        post.content.toLowerCase().includes(query) ||
-        post.author_name.toLowerCase().includes(query)
-      )
-    }
-    
-    // 정렬
-    switch (sortBy) {
-      case "newest":
-        filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-        break
-      case "popular":
-        // 인기순 (임시로 ID 순으로 정렬)
-        filtered.sort((a, b) => a.Id - b.Id)
-        break
-      case "flagged":
-        // 관리자만 신고된 글 보기
-        if (currentUser?.role === "admin") {
-          filtered = filtered.filter(post => post.has_flagged)
-        }
-        break
-    }
-    
-    setPosts(filtered)
-  }
   
 const handleCreatePost = async (e) => {
     e.preventDefault()
@@ -173,7 +137,7 @@ const handleFlagPost = async (postId, reason) => {
   if (loading) return <Loading />
   if (error) return <Error message={error} onRetry={loadData} />
   
-  const filteredPosts = posts.filter(post => {
+const filteredPosts = posts.filter(post => {
     let shouldShow = true
     
     // 검색 필터
@@ -192,6 +156,23 @@ const handleFlagPost = async (postId, reason) => {
     }
     
     return shouldShow
+  }).sort((a, b) => {
+    // 정렬 로직 추가
+    switch (sortBy) {
+      case "newest":
+        return new Date(b.created_at) - new Date(a.created_at)
+      case "popular":
+        // 인기순 (임시로 ID 순으로 정렬)
+        return a.Id - b.Id
+      case "flagged":
+        // 관리자만 신고된 글 보기 - 이미 필터에서 처리됨
+        if (currentUser?.role === "admin") {
+          return posts.filter(post => post.has_flagged).indexOf(b) - posts.filter(post => post.has_flagged).indexOf(a)
+        }
+        return 0
+      default:
+        return 0
+    }
   })
   
   return (
