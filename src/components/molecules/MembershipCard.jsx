@@ -7,7 +7,15 @@ import ApperIcon from "@/components/ApperIcon"
 
 const MembershipCard = ({ tier, currentTier, onSelect, className }) => {
   const isCurrentTier = currentTier?.Id === tier.Id
-  const isPopular = tier.name === "프리미엄"
+  const isPopular = tier.Name === "프리미엄"
+  
+  // Handle features field - convert string to array if needed
+  const features = React.useMemo(() => {
+    if (!tier.features) return [];
+    if (Array.isArray(tier.features)) return tier.features;
+    // If features is a string (MultilineText from database), split by newlines
+    return tier.features.split('\n').filter(feature => feature.trim());
+  }, [tier.features]);
   
   const formatPrice = (price) => {
     return new Intl.NumberFormat("ko-KR").format(price)
@@ -27,7 +35,7 @@ const MembershipCard = ({ tier, currentTier, onSelect, className }) => {
       
       <div className={cn("p-6", isPopular && "pt-12")}>
         <div className="text-center mb-6">
-          <h3 className="text-2xl font-bold text-surface-900 mb-2">{tier.name}</h3>
+<h3 className="text-2xl font-bold text-surface-900 mb-2">{tier.Name}</h3>
           <div className="flex items-center justify-center mb-4">
             <span className="text-4xl font-bold text-primary-600">
               ₩{formatPrice(tier.price_monthly)}
@@ -40,7 +48,7 @@ const MembershipCard = ({ tier, currentTier, onSelect, className }) => {
         </div>
         
         <div className="space-y-3 mb-8">
-          {tier.features.map((feature, index) => (
+{features.map((feature, index) => (
             <div key={index} className="flex items-center">
               <ApperIcon name="Check" className="text-success mr-3 flex-shrink-0" size={20} />
               <span className="text-surface-700">{feature}</span>
