@@ -1,0 +1,20 @@
+[
+  {
+    "Id": 1,
+    "user_id": 1,
+    "lesson_id": 1,
+    "created_at": "2024-01-15T10:30:00Z"
+  },
+  {
+    "Id": 2,
+    "user_id": 1,
+    "lesson_id": 3,
+    "created_at": "2024-01-16T14:20:00Z"
+  },
+  {
+    "Id": 3,
+    "user_id": 1,
+    "lesson_id": 7,
+    "created_at": "2024-01-17T09:15:00Z"
+  }
+]

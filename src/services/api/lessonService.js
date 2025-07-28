@@ -13,6 +13,13 @@ const lessonService = {
     return lessons.find(lesson => lesson.Id === id) || null
   },
   
+  async getFavorites(userId) {
+    await new Promise(resolve => setTimeout(resolve, 300))
+    // This would typically be handled by favoritesService
+    // but keeping for backward compatibility
+    return [...lessons]
+  },
+  
   async create(lesson) {
     await new Promise(resolve => setTimeout(resolve, 400))
     const newLesson = {

@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from "react"
-import { cn } from "@/utils/cn"
-import Button from "@/components/atoms/Button"
-import Badge from "@/components/atoms/Badge"
-import SearchBar from "@/components/molecules/SearchBar"
-import LessonCard from "@/components/molecules/LessonCard"
-import Loading from "@/components/ui/Loading"
-import Error from "@/components/ui/Error"
-import Empty from "@/components/ui/Empty"
-import ApperIcon from "@/components/ApperIcon"
-import lessonService from "@/services/api/lessonService"
-import progressService from "@/services/api/progressService"
+import React, { useEffect, useState } from "react";
+import progressService from "@/services/api/progressService";
+import lessonService from "@/services/api/lessonService";
+import favoritesService from "@/services/api/favoritesService";
+import ApperIcon from "@/components/ApperIcon";
+import SearchBar from "@/components/molecules/SearchBar";
+import LessonCard from "@/components/molecules/LessonCard";
+import Loading from "@/components/ui/Loading";
+import Error from "@/components/ui/Error";
+import Empty from "@/components/ui/Empty";
+import Badge from "@/components/atoms/Badge";
+import Button from "@/components/atoms/Button";
+import { cn } from "@/utils/cn";
 
 const Lessons = () => {
-  const [lessons, setLessons] = useState([])
+const [lessons, setLessons] = useState([])
   const [progress, setProgress] = useState([])
+  const [favorites, setFavorites] = useState([])
   const [filteredLessons, setFilteredLessons] = useState([])
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedTier, setSelectedTier] = useState(0) // 0 = 전체
@@ -47,14 +49,15 @@ const Lessons = () => {
       setLoading(true)
       setError("")
       
-      const [lessonsData, progressData] = await Promise.all([
+const [lessonsData, progressData, favoritesData] = await Promise.all([
         lessonService.getAll(),
-        progressService.getAll()
+        progressService.getAll(),
+        favoritesService.getByUserId(1) // Mock current user ID
       ])
       
       setLessons(lessonsData)
       setProgress(progressData)
-      
+      setFavorites(favoritesData)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -106,8 +109,28 @@ const Lessons = () => {
     // 실제 Algolia 검색 구현 예정
   }
   
-  const getLessonProgress = (lessonId) => {
+const getLessonProgress = (lessonId) => {
     return progress.find(p => p.lesson_id === lessonId)
+  }
+
+  const isLessonFavorited = (lessonId) => {
+    return favorites.some(fav => fav.lesson_id === lessonId)
+  }
+
+  const handleFavoriteChange = (lessonId, isFavorited) => {
+    if (isFavorited) {
+      // Add to favorites
+      const newFavorite = {
+        Id: Math.max(...favorites.map(f => f.Id), 0) + 1,
+        user_id: 1,
+        lesson_id: lessonId,
+        created_at: new Date().toISOString()
+      }
+      setFavorites(prev => [...prev, newFavorite])
+    } else {
+      // Remove from favorites
+      setFavorites(prev => prev.filter(fav => fav.lesson_id !== lessonId))
+    }
   }
   
   if (loading) return <Loading />
@@ -195,11 +218,13 @@ const Lessons = () => {
         />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredLessons.map((lesson) => (
+{filteredLessons.map((lesson) => (
             <LessonCard
               key={lesson.Id}
               lesson={lesson}
               progress={getLessonProgress(lesson.Id)}
+              isFavorited={isLessonFavorited(lesson.Id)}
+              onFavoriteChange={handleFavoriteChange}
             />
           ))}
         </div>

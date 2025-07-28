@@ -1,12 +1,44 @@
-import React from "react"
+import React, { useState } from "react"
 import { Link } from "react-router-dom"
+import { toast } from "react-toastify"
 import { cn } from "@/utils/cn"
 import Card from "@/components/atoms/Card"
 import Badge from "@/components/atoms/Badge"
 import ProgressBar from "@/components/atoms/ProgressBar"
+import Button from "@/components/atoms/Button"
 import ApperIcon from "@/components/ApperIcon"
+import favoritesService from "@/services/api/favoritesService"
+const LessonCard = ({ lesson, progress, isFavorited = false, onFavoriteChange, className }) => {
+  const [isTogglingFavorite, setIsTogglingFavorite] = useState(false)
 
-const LessonCard = ({ lesson, progress, className }) => {
+  const handleFavoriteToggle = async (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    if (isTogglingFavorite) return
+    
+    setIsTogglingFavorite(true)
+    
+    try {
+      const userId = 1 // Mock current user ID
+      
+      if (isFavorited) {
+        await favoritesService.removeFavorite(userId, lesson.Id)
+        toast.success("즐겨찾기에서 제거되었습니다")
+      } else {
+        await favoritesService.addFavorite(userId, lesson.Id)
+        toast.success("즐겨찾기에 추가되었습니다")
+      }
+      
+      if (onFavoriteChange) {
+        onFavoriteChange(lesson.Id, !isFavorited)
+      }
+    } catch (error) {
+      toast.error(error.message || "오류가 발생했습니다")
+    } finally {
+      setIsTogglingFavorite(false)
+    }
+  }
   const progressPct = progress?.progress_pct || 0
   
   const getTierBadgeVariant = (tierRequired) => {
@@ -34,16 +66,38 @@ const LessonCard = ({ lesson, progress, className }) => {
         hover 
         className={cn("overflow-hidden group", className)}
       >
-        <div className="aspect-video bg-gradient-to-br from-primary-500 to-secondary-600 relative overflow-hidden">
+<div className="aspect-video bg-gradient-to-br from-primary-500 to-secondary-600 relative overflow-hidden">
           <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
           <div className="absolute top-4 left-4">
             <Badge variant={getTierBadgeVariant(lesson.tier_required)}>
               {getTierName(lesson.tier_required)}
             </Badge>
           </div>
-          <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1 text-white text-xs font-medium">
-            <ApperIcon name="Clock" size={12} className="inline mr-1" />
-            {lesson.duration_minutes}분
+          <div className="absolute top-4 right-4 flex items-center gap-2">
+            <div className="bg-white/20 backdrop-blur-sm rounded-lg px-2 py-1 text-white text-xs font-medium">
+              <ApperIcon name="Clock" size={12} className="inline mr-1" />
+              {lesson.duration_minutes}분
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleFavoriteToggle}
+              disabled={isTogglingFavorite}
+              className={cn(
+                "w-8 h-8 p-0 bg-white/20 backdrop-blur-sm hover:bg-white/30 border-none transition-all duration-200",
+                isFavorited ? "text-red-400 hover:text-red-300" : "text-white/70 hover:text-white",
+                isTogglingFavorite && "opacity-50 cursor-not-allowed"
+              )}
+            >
+              <ApperIcon 
+                name={isFavorited ? "Heart" : "Heart"} 
+                size={16} 
+                className={cn(
+                  "transition-all duration-200",
+                  isFavorited ? "fill-current" : "fill-none"
+                )}
+              />
+            </Button>
           </div>
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
